@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Details – CineBook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        /* ── TOKENS ──────────────────────────────────────── */
+        :root {
+            --bg:           #0A0E1A;
+            --surface:      #141824;
+            --card:         #1A1F30;
+            --border:       #252C42;
+            --accent:       #C8102E;
+            --accent-dk:    #9E0C24;
+            --gold:         #C9A84C;
+            --text:         #F0EDE8;
+            --muted:        #7A829A;
+            --font-display: 'Bebas Neue', sans-serif;
+            --font-body:    'Inter', sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 15px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        a { color: inherit; text-decoration: none; }
+        img { display: block; max-width: 100%; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+        /* ── NAV ─────────────────────────────────────────── */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10,14,26,0.92);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        .nav__logo {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            letter-spacing: 0.04em;
+        }
+        .nav__logo span { color: var(--accent); }
+        .nav__back {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            transition: color 0.2s;
+            margin-left: auto;
+        }
+        .nav__back:hover { color: var(--text); }
+
+        /* ── HERO BACKDROP ───────────────────────────────── */
+        .detail-hero {
+            position: relative;
+            min-height: 480px;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+        }
+        .detail-hero__bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center top;
+            filter: blur(3px) brightness(0.35);
+            transform: scale(1.05);
+        }
+        .detail-hero__grad {
+            position: absolute;
+            inset: 0;
+            background:
+                    linear-gradient(to top,  var(--bg) 0%, transparent 60%),
+                    linear-gradient(to right, var(--bg) 0%, transparent 50%);
+        }
+
+        /* ── MAIN LAYOUT ─────────────────────────────────── */
+        .detail-body {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* Pull the card up over the hero */
+        .detail-card {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 2.5rem;
+            margin-top: -180px;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* ── POSTER ──────────────────────────────────────── */
+        .detail-poster {
+            flex-shrink: 0;
+        }
+        .detail-poster img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+            border: 1px solid var(--border);
+        }
+        .detail-poster__placeholder {
+            width: 100%;
+            aspect-ratio: 2/3;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        /* ── INFO COLUMN ─────────────────────────────────── */
+        .detail-info {
+            padding-top: 2rem;
+        }
+        .detail-info__eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+        .detail-info__eyebrow::before {
+            content: '';
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--accent);
+        }
+        .detail-info__title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            line-height: 0.95;
+            letter-spacing: 0.02em;
+            margin-bottom: 1rem;
+        }
+        .detail-info__meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 1.25rem;
+        }
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.25rem 0.65rem;
+            border-radius: 4px;
+            border: 1px solid currentColor;
+        }
+        .badge--rating { color: var(--gold); border-color: var(--gold); }
+        .badge--genre  { color: var(--muted); border-color: var(--border); }
+        .badge--status-now {
+            background: var(--accent);
+            color: var(--text);
+            border-color: var(--accent);
+        }
+        .badge--status-soon {
+            background: var(--gold);
+            color: #0A0E1A;
+            border-color: var(--gold);
+        }
+        .detail-info__stars {
+            color: var(--gold);
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+        }
+        .detail-info__synopsis {
+            font-size: 0.95rem;
+            color: #b0b8cc;
+            line-height: 1.8;
+            max-width: 580px;
+            margin-bottom: 1.5rem;
+        }
+        .detail-info__credits {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .credit-item__label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.2rem;
+        }
+        .credit-item__value {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        /* ── SHOWTIMES ───────────────────────────────────── */
+        .showtimes-section { margin-bottom: 2.5rem; }
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .section-slash {
+            display: inline-block;
+            width: 4px;
+            height: 1.6rem;
+            background: var(--accent);
+            transform: skewX(-10deg);
+            flex-shrink: 0;
+        }
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            letter-spacing: 0.04em;
+        }
+        .showtime-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .showtime-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1.4rem;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .showtime-btn:hover {
+            border-color: var(--accent);
+            background: rgba(200,16,46,0.08);
+            transform: translateY(-2px);
+        }
+        .showtime-btn.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .showtime-btn__hall {
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .showtime-btn.selected .showtime-btn__hall { color: rgba(255,255,255,0.7); }
+
+        /* ── BOOK CTA ────────────────────────────────────── */
+        .book-cta {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+        .book-cta.visible { display: flex; }
+        .book-cta__info { flex: 1; }
+        .book-cta__label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.2rem;
+        }
+        .book-cta__selected {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            letter-spacing: 0.03em;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.85rem 2rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .btn--primary { background: var(--accent); color: var(--text); }
+        .btn--primary:hover { background: var(--accent-dk); transform: translateY(-1px); }
+
+        /* ── TRAILER ─────────────────────────────────────── */
+        .trailer-section { margin-bottom: 2.5rem; }
+        .trailer-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: #000;
+        }
+        .trailer-wrapper iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .trailer-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            color: var(--muted);
+            background: var(--surface);
+        }
+        .trailer-placeholder svg { opacity: 0.3; }
+
+        /* ── SKELETON ────────────────────────────────────── */
+        .skeleton-line {
+            height: 14px;
+            background: var(--border);
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .skeleton-line.w-40  { width: 40%; }
+        .skeleton-line.w-60  { width: 60%; }
+        .skeleton-line.w-80  { width: 80%; }
+        .skeleton-line.w-100 { width: 100%; }
+        .skeleton-line.tall  { height: 200px; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+
+        /* ── ERROR ───────────────────────────────────────── */
+        .error-box {
+            padding: 2rem;
+            background: rgba(200,16,46,0.08);
+            border: 1px solid rgba(200,16,46,0.3);
+            border-radius: 8px;
+            color: #f87171;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        /* ── RESPONSIVE ──────────────────────────────────── */
+        @media (max-width: 768px) {
+            .detail-card {
+                grid-template-columns: 1fr;
+                margin-top: -60px;
+            }
+            .detail-poster { max-width: 200px; }
+            .detail-info { padding-top: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────────── -->
+<nav class="nav">
+    <a href="index.html" class="nav__logo">Cine<span>Book</span></a>
+    <a href="index.html" class="nav__back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Back to Movies
+    </a>
+</nav>
+
+<!-- ── HERO BACKDROP (filled by JS) ─────────────────── -->
+<div class="detail-hero" id="detailHero">
+    <div class="detail-hero__bg" id="heroBg"></div>
+    <div class="detail-hero__grad"></div>
+</div>
+
+<!-- ── MAIN CONTENT ──────────────────────────────────── -->
+<div class="detail-body">
+
+    <!-- Loading skeleton -->
+    <div id="skeletonView" class="detail-card">
+        <div class="detail-poster">
+            <div class="skeleton-line tall" style="border-radius:12px; height:390px;"></div>
+        </div>
+        <div class="detail-info" style="padding-top:2rem;">
+            <div class="skeleton-line w-40"></div>
+            <div class="skeleton-line w-80" style="height:48px; margin-bottom:1rem;"></div>
+            <div class="skeleton-line w-60"></div>
+            <div class="skeleton-line w-100"></div>
+            <div class="skeleton-line w-100"></div>
+            <div class="skeleton-line w-80"></div>
+        </div>
+    </div>
+
+    <!-- Real content (hidden until loaded) -->
+    <div id="detailView" style="display:none;">
+
+        <div class="detail-card">
+            <!-- Poster -->
+            <div class="detail-poster">
+                <img id="moviePoster" src="" alt="" />
+            </div>
+
+            <!-- Info -->
+            <div class="detail-info">
+                <p class="detail-info__eyebrow" id="movieGenre">Genre</p>
+                <h1 class="detail-info__title" id="movieTitle">Title</h1>
+                <div class="detail-info__meta" id="movieMeta"></div>
+                <p class="detail-info__synopsis" id="movieSynopsis"></p>
+
+                <div class="detail-info__credits" id="movieCredits"></div>
+
+                <!-- Showtimes -->
+                <div class="showtimes-section">
+                    <div class="section-label">
+                        <span class="section-slash"></span>
+                        <h2 class="section-title">Showtimes</h2>
+                    </div>
+                    <div class="showtime-grid" id="showtimeGrid"></div>
+                </div>
+
+                <!-- Book CTA — appears after selecting a showtime -->
+                <div class="book-cta" id="bookCta">
+                    <div class="book-cta__info">
+                        <p class="book-cta__label">Selected Showtime</p>
+                        <p class="book-cta__selected" id="selectedShowtime">—</p>
+                    </div>
+                    <a href="#" class="btn btn--primary" id="bookBtn">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                        Book Tickets
+                    </a>
+                </div>
+
+            </div>
+        </div><!-- /.detail-card -->
+
+        <!-- Trailer -->
+        <div class="trailer-section" style="margin-top: 3rem;">
+            <div class="section-label">
+                <span class="section-slash"></span>
+                <h2 class="section-title">Trailer</h2>
+            </div>
+            <div class="trailer-wrapper">
+                <div class="trailer-placeholder" id="trailerPlaceholder">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="10 8 16 12 10 16 10 8"/>
+                    </svg>
+                    <span style="font-size:0.8rem;">No trailer available</span>
+                </div>
+                <iframe id="trailerFrame"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        style="display:none;"></iframe>
+            </div>
+        </div>
+
+    </div><!-- /#detailView -->
+
+    <!-- Error state -->
+    <div id="errorView" style="display:none;">
+        <div class="error-box">
+            <p>⚠️ Could not load movie details. Make sure your Spring Boot app is running on port 8080.</p>
+            <br>
+            <a href="index.html" class="btn btn--primary" style="display:inline-flex; margin-top:0.5rem;">
+                ← Back to Home
+            </a>
+        </div>
+    </div>
+
+</div><!-- /.detail-body -->
+
+<script>
+    const API_BASE = 'http://localhost:8080/api/movies';
+
+    // Hardcoded showtimes — will be dynamic in Sprint 2
+    const SHOWTIMES = [
+        { time: '11:00 AM', hall: 'Hall 1' },
+        { time: '2:00 PM',  hall: 'Hall 2' },
+        { time: '5:00 PM',  hall: 'Hall 1' },
+        { time: '8:00 PM',  hall: 'Hall 3' },
+        { time: '10:30 PM', hall: 'Hall 2' },
+    ];
+
+    const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+
+    /* ── Get movie ID from URL ───────────────────────── */
+    function getMovieId() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id');
+    }
+
+    /* ── Convert YouTube URL to embed URL ────────────── */
+    function toEmbedUrl(url) {
+        if (!url) return null;
+        // Already an embed URL
+        if (url.includes('youtube.com/embed/')) return url;
+        // Standard watch URL: https://www.youtube.com/watch?v=XXXX
+        const watchMatch = url.match(/[?&]v=([^&]+)/);
+        if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+        // Short URL: https://youtu.be/XXXX
+        const shortMatch = url.match(/youtu\.be\/([^?]+)/);
+        if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+        return url;
+    }
+
+    /* ── Render the movie ────────────────────────────── */
+    function render(movie) {
+        // Hero backdrop
+        document.getElementById('heroBg').style.backgroundImage =
+            `url('${movie.posterUrl}')`;
+
+        // Poster
+        const posterEl = document.getElementById('moviePoster');
+        posterEl.src = movie.posterUrl || '';
+        posterEl.alt = movie.title;
+
+        // Genre eyebrow
+        document.getElementById('movieGenre').textContent = movie.genre.toUpperCase();
+
+        // Title
+        document.getElementById('movieTitle').textContent = movie.title;
+        document.title = `${movie.title} – CineBook`;
+
+        // Meta badges
+        const statusBadge = movie.status === 'now-playing'
+            ? `<span class="badge badge--status-now">Now Playing</span>`
+            : `<span class="badge badge--status-soon">Coming Soon</span>`;
+        document.getElementById('movieMeta').innerHTML = `
+      ${statusBadge}
+      <span class="badge badge--rating">${movie.rating}</span>
+      <span class="badge badge--genre">${movie.runtime}</span>
+      <span class="detail-info__stars">${stars(movie.stars)}</span>`;
+
+        // Synopsis
+        document.getElementById('movieSynopsis').textContent =
+            movie.synopsis || 'No synopsis available.';
+
+        // Credits
+        const credits = [];
+        if (movie.director) credits.push({ label: 'Director', value: movie.director });
+        if (movie.cast)     credits.push({ label: 'Cast',     value: movie.cast });
+        document.getElementById('movieCredits').innerHTML = credits.map(c => `
+      <div class="credit-item">
+        <p class="credit-item__label">${c.label}</p>
+        <p class="credit-item__value">${c.value}</p>
+      </div>`).join('');
+
+        // Showtimes
+        const grid = document.getElementById('showtimeGrid');
+        grid.innerHTML = SHOWTIMES.map(s => `
+      <button class="showtime-btn" data-time="${s.time}" data-hall="${s.hall}">
+        ${s.time}
+        <span class="showtime-btn__hall">${s.hall}</span>
+      </button>`).join('');
+
+        grid.addEventListener('click', e => {
+            const btn = e.target.closest('.showtime-btn');
+            if (!btn) return;
+
+            // Deselect all, select clicked
+            grid.querySelectorAll('.showtime-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+
+            const time = btn.dataset.time;
+            const hall = btn.dataset.hall;
+
+            // Show book CTA
+            document.getElementById('selectedShowtime').textContent = `${time} — ${hall}`;
+            document.getElementById('bookCta').classList.add('visible');
+
+            // Wire booking button: pass movie id, title, time to booking page
+            const params = new URLSearchParams({
+                id:       movie.id,
+                title:    movie.title,
+                showtime: time,
+                hall:     hall,
+            });
+            document.getElementById('bookBtn').href = `booking.html?${params}`;
+        });
+
+        // Trailer
+        const embedUrl = toEmbedUrl(movie.trailerUrl);
+        if (embedUrl) {
+            document.getElementById('trailerPlaceholder').style.display = 'none';
+            const frame = document.getElementById('trailerFrame');
+            frame.src = embedUrl;
+            frame.style.display = 'block';
+        }
+
+        // Show content
+        document.getElementById('skeletonView').style.display = 'none';
+        document.getElementById('detailView').style.display  = 'block';
+    }
+
+    /* ── Fetch and render ────────────────────────────── */
+    async function loadMovie() {
+        const id = getMovieId();
+        if (!id) {
+            window.location.href = 'index.html';
+            return;
+        }
+        try {
+            const res = await fetch(`${API_BASE}/${id}`);
+            if (!res.ok) throw new Error(`Status ${res.status}`);
+            const movie = await res.json();
+            render(movie);
+        } catch (err) {
+            console.error(err);
+            document.getElementById('skeletonView').style.display = 'none';
+            document.getElementById('errorView').style.display    = 'block';
+        }
+    }
+
+    loadMovie();
+</script>
+</body>
+</html>
