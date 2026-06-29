@@ -49,7 +49,7 @@ INSERT INTO movies (title, genre, rating, runtime, synopsis, director, cast, tra
                                                                                                                              'A journey across a dystopian future America, following a team of military-embedded journalists as they race against time to reach DC before rebel factions descend on the White House.',
                                                                                                                              'Alex Garland',
                                                                                                                              'Kirsten Dunst, Wagner Moura, Cailee Spaeny',
-                                                                                                                             'https://www.youtube.com/embed/pE6EvEoOCtA',
+                                                                                                                             'https://www.youtube.com/embed/aDyQxtg0V2w',
                                                                                                                              'https://images.unsplash.com/photo-1531219572328-a0171b4448a3?w=400&q=80',
                                                                                                                              4,
                                                                                                                              'now-playing'
@@ -62,7 +62,7 @@ INSERT INTO movies (title, genre, rating, runtime, synopsis, director, cast, tra
                                                                                                                              'An American nun relocates to a remote Italian convent, only to find herself at the center of a horrifying mystery.',
                                                                                                                              'Michael Mohan',
                                                                                                                              'Sydney Sweeney, Álvaro Morte, Benedetta Porcaroli',
-                                                                                                                             'https://www.youtube.com/embed/vxTiM4OTgkw',
+                                                                                                                             'https://www.youtube.com/embed/9PZt77WKkoc',
                                                                                                                              'https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=400&q=80',
                                                                                                                              3,
                                                                                                                              'now-playing'
@@ -75,7 +75,7 @@ INSERT INTO movies (title, genre, rating, runtime, synopsis, director, cast, tra
                                                                                                                              'The Spengler family returns to the iconic New York City firehouse where the original Ghostbusters have taken on a new threat that could send the world into a second Ice Age.',
                                                                                                                              'Gil Kenan',
                                                                                                                              'Paul Rudd, Carrie Coon, Finn Wolfhard',
-                                                                                                                             'https://www.youtube.com/embed/rH_xl0oqJtQ',
+                                                                                                                             'https://www.youtube.com/embed/HpOBXh02rVc',
                                                                                                                              'https://images.unsplash.com/photo-1535016120720-40c646be5580?w=400&q=80',
                                                                                                                              4,
                                                                                                                              'now-playing'
@@ -88,7 +88,7 @@ INSERT INTO movies (title, genre, rating, runtime, synopsis, director, cast, tra
                                                                                                                              'Po must train a new Dragon Warrior while facing a shape-shifting villain called the Chameleon, who threatens the Valley of Peace.',
                                                                                                                              'Mike Mitchell',
                                                                                                                              'Jack Black, Viola Davis, Bryan Cranston',
-                                                                                                                             'https://www.youtube.com/embed/bQRLVubEJJ0',
+                                                                                                                             'https://www.youtube.com/embed/_inKs4eeHiI',
                                                                                                                              'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=400&q=80',
                                                                                                                              4,
                                                                                                                              'now-playing'
@@ -101,7 +101,7 @@ INSERT INTO movies (title, genre, rating, runtime, synopsis, director, cast, tra
                                                                                                                              'A young man emerges from prison hell-bent on exacting vengeance against the corrupt leaders who murdered his mother and terrorized his community.',
                                                                                                                              'Dev Patel',
                                                                                                                              'Dev Patel, Sharlto Copley, Sobhita Dhulipala',
-                                                                                                                             'https://www.youtube.com/embed/cxoFhqzAkOM',
+                                                                                                                             'https://www.youtube.com/embed/g8zxiB5Qhsc',
                                                                                                                              'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&q=80',
                                                                                                                              4,
                                                                                                                              'now-playing'
@@ -114,7 +114,7 @@ INSERT INTO movies (title, genre, rating, runtime, synopsis, director, cast, tra
                                                                                                                              'The story of Italian immigrant Francesca Cabrini, who arrived in New York City in 1889 and persuaded the mayor to give her a crumbling building to house the city''s most desperate children.',
                                                                                                                              'Alejandro Monteverde',
                                                                                                                              'Cristiana Dell''Anna, David Morse, John Lithgow',
-                                                                                                                             'https://www.youtube.com/embed/qXKCO1YLZNE',
+                                                                                                                             'https://www.youtube.com/embed/cuOQbToSU8M',
                                                                                                                              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
                                                                                                                              4,
                                                                                                                              'now-playing'
@@ -140,7 +140,7 @@ INSERT INTO movies (title, genre, rating, runtime, synopsis, director, cast, tra
                                                                                                                              'Experience the day the world went quiet — the origin story of the alien invasion that forced humanity into silence to survive.',
                                                                                                                              'Michael Sarnoski',
                                                                                                                              'Lupita Nyong''o, Joseph Quinn, Alex Wolff',
-                                                                                                                             'https://www.youtube.com/embed/4kqVAoAqfSI',
+                                                                                                                             'https://www.youtube.com/embed/YPY7J-flzE8',
                                                                                                                              'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=400&q=80',
                                                                                                                              4,
                                                                                                                              'coming-soon'
@@ -179,7 +179,7 @@ INSERT INTO movies (title, genre, rating, runtime, synopsis, director, cast, tra
                                                                                                                              'A group of young space colonizers come face to face with the most terrifying life form in the universe while scavenging the depths of an abandoned space station.',
                                                                                                                              'Fede Álvarez',
                                                                                                                              'Cailee Spaeny, David Jonsson, Archie Renaux',
-                                                                                                                             'https://www.youtube.com/embed/5a4QTgCQs5M',
+                                                                                                                             'https://www.youtube.com/embed/OzY2r2JXsDM',
                                                                                                                              'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=400&q=80',
                                                                                                                              4,
                                                                                                                              'coming-soon'
