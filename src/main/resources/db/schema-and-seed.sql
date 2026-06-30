@@ -184,3 +184,16 @@ INSERT INTO movies (title, genre, rating, runtime, synopsis, director, cast, tra
                                                                                                                              4,
                                                                                                                              'coming-soon'
                                                                                                                          );
+-- ============================================================
+--  SHOWTIMES — table only. Rows are generated at startup by
+--  ShowtimeSeeder.java, relative to today's date.
+-- ============================================================
+DROP TABLE IF EXISTS showtimes;
+CREATE TABLE showtimes (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    movie_id    INTEGER NOT NULL,
+    show_date   TEXT    NOT NULL,
+    show_time   TEXT    NOT NULL,
+    auditorium  TEXT,
+    FOREIGN KEY (movie_id) REFERENCES movies(id)
+);

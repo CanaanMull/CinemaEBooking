@@ -549,7 +549,26 @@
             .ticker { animation: none; }
             .movie-card, .skeleton-card { transition: none; animation: none; }
         }
-    </style>
+    
+    /* ── DATE FILTER + SHOWTIMES ──────────────────────────────── */
+    .date-filter { display:flex; align-items:center; gap:.55rem; }
+    .date-filter label {
+      font-size:.72rem; letter-spacing:.08em; text-transform:uppercase;
+      color:#8a8f9c; font-weight:600;
+    }
+    .date-filter input[type="date"] {
+      background:#1a1f30; color:#fff; border:1px solid #2c3344;
+      border-radius:8px; padding:.45rem .65rem; font-family:inherit;
+      font-size:.9rem; color-scheme:dark; cursor:pointer;
+    }
+    .date-filter input[type="date"]:hover { border-color:#C8102E; }
+    .showtime-row { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.65rem; }
+    .showtime-pill {
+      background:#202637; border:1px solid #2f3854; color:#dfe4f0;
+      font-size:.72rem; padding:.22rem .5rem; border-radius:6px; white-space:nowrap;
+    }
+    .showtime-none { font-size:.72rem; color:#6b7180; font-style:italic; }
+  </style>
 </head>
 <body>
 
@@ -630,7 +649,10 @@
             <span class="section__slash"></span>
             <h2 class="section__title">Now Playing</h2>
         </div>
-        <a href="#" class="section__link">View All →</a>
+        <div class="date-filter">
+            <label for="showDate">Showing on</label>
+            <input type="date" id="showDate" />
+        </div>
     </div>
     <div id="nowPlayingGrid">
         <!-- Skeleton placeholders while loading -->
@@ -769,72 +791,119 @@
         }
     }
 
-    /* ── MAIN DATA LOAD ───────────────────────────────────────── */
-    let allMovies = [];
+    /* ── DATE HELPERS ─────────────────────────────────────────── */
+    function isoDate(d) {
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function to12h(hhmm) {
+        const [h, m] = hhmm.split(':').map(Number);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12  = ((h + 11) % 12) + 1;
+        return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+    }
 
+    /* ── STATE ────────────────────────────────────────────────── */
+    let allMovies     = [];
+    let selectedDate  = isoDate(new Date());
+    let selectedGenre = 'all';
+    let dateMovies    = [];
+
+    /* ── CARD WITH SHOWTIMES ──────────────────────────────────── */
+    function movieCardWithTimes(m, times) {
+        const pills = (times || []).map(t =>
+            `<span class="showtime-pill">${to12h(t)}</span>`).join('');
+        return `
+      <a href="movie-details.html?id=${m.id}" class="movie-card" data-genre="${m.genre}" style="display:block; text-decoration:none;">
+        <div class="movie-card__poster">
+          <img src="${m.posterUrl || 'https://via.placeholder.com/300x450?text=No+Poster'}" alt="${m.title}" loading="lazy" />
+          <span class="movie-card__now-playing">Now Playing</span>
+        </div>
+        <div class="movie-card__body">
+          <p class="movie-card__genre">${m.genre}</p>
+          <h3 class="movie-card__title">${m.title}</h3>
+          <div class="movie-card__meta">
+            <span class="movie-card__stars">${stars(m.stars)}</span>
+            <span>${m.rating} · ${m.runtime}</span>
+          </div>
+          <div class="showtime-row">${pills || '<span class="showtime-none">No showings</span>'}</div>
+        </div>
+      </a>`;
+    }
+
+    function renderNowPlaying() {
+        const grid = document.getElementById('nowPlayingMovies');
+        const list = selectedGenre === 'all'
+            ? dateMovies
+            : dateMovies.filter(item => item.movie.genre === selectedGenre);
+        if (!list.length) {
+            grid.innerHTML = `<div class="no-results"><p>No movies playing on this date.</p></div>`;
+            return;
+        }
+        grid.innerHTML = list.map(item => movieCardWithTimes(item.movie, item.times)).join('');
+    }
+
+    /* ── LOAD SHOWTIMES FOR A DATE ────────────────────────────── */
+    async function loadShowtimesForDate(date) {
+        const skeleton = document.getElementById('nowPlayingSkeleton');
+        const grid     = document.getElementById('nowPlayingMovies');
+        skeleton.style.display = 'grid';
+        skeleton.innerHTML = Array(8).fill(skeletonCard()).join('');
+        grid.style.display = 'none';
+        try {
+            const res = await fetch(`http://localhost:8080/api/showtimes/movies?date=${date}`);
+            if (!res.ok) throw new Error(`Server returned ${res.status}`);
+            dateMovies = await res.json();
+            skeleton.style.display = 'none';
+            grid.style.display = 'grid';
+            renderNowPlaying();
+        } catch (err) {
+            console.error('Failed to load showtimes:', err);
+            skeleton.style.display = 'none';
+            grid.style.display = 'block';
+            showError(grid, 'Could not load showtimes. Make sure your Spring Boot app is running on port 8080.');
+        }
+    }
+
+    /* ── MAIN DATA LOAD (hero, ticker, coming soon) ───────────── */
     async function loadMovies() {
-        const nowPlayingSkeleton = document.getElementById('nowPlayingSkeleton');
-        const nowPlayingMovies   = document.getElementById('nowPlayingMovies');
-        const comingSoonRow      = document.getElementById('comingSoonRow');
-
-        // Show skeletons while loading
-        nowPlayingSkeleton.innerHTML = Array(8).fill(skeletonCard()).join('');
-        comingSoonRow.innerHTML      = Array(4).fill(skeletonCard()).join('');
-
+        const comingSoonRow = document.getElementById('comingSoonRow');
+        comingSoonRow.innerHTML = Array(4).fill(skeletonCard()).join('');
         try {
             const response = await fetch(API_BASE);
             if (!response.ok) throw new Error(`Server returned ${response.status}`);
             allMovies = await response.json();
-
             buildHero(allMovies);
             buildTicker(allMovies);
-
-            const nowPlaying  = allMovies.filter(m => m.status === 'now-playing');
-            const comingSoon  = allMovies.filter(m => m.status === 'coming-soon');
-
-            // Hide skeleton, show real cards
-            nowPlayingSkeleton.style.display = 'none';
-            nowPlayingMovies.style.display   = 'grid';
-            renderGrid(nowPlayingMovies, nowPlaying);
-            renderGrid(comingSoonRow,    comingSoon);
-
+            renderGrid(comingSoonRow, allMovies.filter(m => m.status === 'coming-soon'));
         } catch (err) {
             console.error('Failed to load movies:', err);
-            nowPlayingSkeleton.style.display = 'none';
-            nowPlayingMovies.style.display   = 'block';
-            showError(nowPlayingMovies,
-                'Could not connect to the server. Make sure your Spring Boot app is running on port 8080.');
-            showError(comingSoonRow, 'Could not load coming soon movies.');
+            showError(comingSoonRow, 'Could not load movies. Make sure your Spring Boot app is running on port 8080.');
         }
+        loadShowtimesForDate(selectedDate);
     }
 
-    /* ── FILTER (calls API endpoint) ─────────────────────────── */
-    let filterDebounce;
-    document.getElementById('filterBar').addEventListener('click', async e => {
+    /* ── DATE PICKER ──────────────────────────────────────────── */
+    const dateInput = document.getElementById('showDate');
+    if (dateInput) {
+        const max = new Date();
+        max.setDate(max.getDate() + 6);
+        dateInput.value = selectedDate;
+        dateInput.min   = selectedDate;
+        dateInput.max   = isoDate(max);
+        dateInput.addEventListener('change', () => {
+            selectedDate = dateInput.value;
+            loadShowtimesForDate(selectedDate);
+        });
+    }
+
+    /* ── GENRE FILTER (client-side, over the selected date) ───── */
+    document.getElementById('filterBar').addEventListener('click', e => {
         const btn = e.target.closest('.filter-btn');
         if (!btn) return;
-
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
-        const genre = btn.dataset.genre;
-        const grid  = document.getElementById('nowPlayingMovies');
-
-        try {
-            let url = genre === 'all'
-                ? `${API_BASE}/now-playing`
-                : `${API_BASE}/filter?genre=${encodeURIComponent(genre)}`;
-
-            // If filtering by genre, we only want now-playing ones
-            // So filter client-side from what we already have (avoids extra endpoint complexity)
-            const filtered = genre === 'all'
-                ? allMovies.filter(m => m.status === 'now-playing')
-                : allMovies.filter(m => m.status === 'now-playing' && m.genre === genre);
-
-            renderGrid(grid, filtered);
-        } catch (err) {
-            showError(grid, 'Filter failed. Please try again.');
-        }
+        selectedGenre = btn.dataset.genre;
+        renderNowPlaying();
     });
 
     /* ── SEARCH (calls API endpoint) ─────────────────────────── */
