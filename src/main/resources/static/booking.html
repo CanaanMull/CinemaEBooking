@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Tickets</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+    }
+
+    header {
+      background: #000;
+      padding: 20px 40px;
+      border-bottom: 3px solid #e50914;
+    }
+
+    header h1 {
+      margin: 0;
+      color: #e50914;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    .booking-card {
+      background: #1c1c1c;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+    }
+
+    h2 {
+      color: #f5c518;
+      margin-top: 30px;
+    }
+
+    .movie-info {
+      background: #2b2b2b;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .movie-info p {
+      font-size: 18px;
+      margin: 8px 0;
+    }
+
+    .ticket-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #2b2b2b;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .ticket-row input {
+      width: 70px;
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      text-align: center;
+    }
+
+    .screen {
+      width: 75%;
+      margin: 25px auto 20px;
+      padding: 10px;
+      background: #f5c518;
+      color: #000;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+
+    .seat-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 48px);
+      gap: 10px;
+      justify-content: center;
+      margin: 25px 0;
+    }
+
+    .seat {
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 8px;
+      background: #444;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .seat:hover {
+      background: #666;
+    }
+
+    .seat.selected {
+      background: #f5c518;
+      color: #000;
+    }
+
+    .seat.occupied {
+      background: #777;
+      color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-box {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+
+    .available {
+      background: #444;
+    }
+
+    .selected-box {
+      background: #f5c518;
+    }
+
+    .occupied-box {
+      background: #777;
+    }
+
+    .summary {
+      background: #2b2b2b;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 25px;
+    }
+
+    .summary p {
+      font-size: 17px;
+      margin: 8px 0;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .back-btn {
+      background: #444;
+      color: white;
+    }
+
+    .continue-btn {
+      background: #e50914;
+      color: white;
+    }
+
+    .continue-btn:hover {
+      background: #b20710;
+    }
+
+    .back-btn:hover {
+      background: #666;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Cinema E-Booking</h1>
+  </header>
+
+  <div class="container">
+    <div class="booking-card">
+      <h1>Book Tickets</h1>
+
+      <div class="movie-info">
+        <p><strong>Movie:</strong> <span id="movieTitle">Selected Movie</span></p>
+        <p><strong>Showtime:</strong> <span id="showtime">Selected Showtime</span></p>
+        <p><strong>Hall:</strong> <span id="hall">Main Hall</span></p>
+      </div>
+
+      <h2>Ticket Quantities</h2>
+
+      <div class="ticket-row">
+        <span>Adult Ticket - $12.00</span>
+        <input type="number" id="adultQty" min="0" value="0" />
+      </div>
+
+      <div class="ticket-row">
+        <span>Child Ticket - $8.00</span>
+        <input type="number" id="childQty" min="0" value="0" />
+      </div>
+
+      <div class="ticket-row">
+        <span>Senior Ticket - $9.00</span>
+        <input type="number" id="seniorQty" min="0" value="0" />
+      </div>
+
+      <h2>Select Seats</h2>
+
+      <div class="screen">SCREEN</div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-box available"></div>
+          <span>Available</span>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-box selected-box"></div>
+          <span>Selected</span>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-box occupied-box"></div>
+          <span>Occupied</span>
+        </div>
+      </div>
+
+      <div class="seat-grid" id="seatGrid"></div>
+
+      <div class="summary">
+        <h2>Order Summary</h2>
+        <p><strong>Selected Seats:</strong> <span id="selectedSeats">None</span></p>
+        <p><strong>Total Tickets:</strong> <span id="totalTickets">0</span></p>
+        <p><strong>Total Price:</strong> $<span id="totalPrice">0.00</span></p>
+      </div>
+
+      <div class="buttons">
+        <button class="btn back-btn" onclick="history.back()">Back</button>
+        <button class="btn continue-btn" onclick="continueBooking()">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const adultPrice = 12;
+    const childPrice = 8;
+    const seniorPrice = 9;
+    const selectedSeats = [];
+
+    const params = new URLSearchParams(window.location.search);
+
+    const movieTitle =
+      params.get("title") ||
+      params.get("movie") ||
+      "Selected Movie";
+
+    const showtime =
+      params.get("showtime") ||
+      params.get("time") ||
+      "Selected Showtime";
+
+    const hall =
+      params.get("hall") ||
+      "Main Hall";
+
+    document.getElementById("movieTitle").textContent = movieTitle;
+    document.getElementById("showtime").textContent = showtime;
+    document.getElementById("hall").textContent = hall;
+
+    function createSeats() {
+      const seatGrid = document.getElementById("seatGrid");
+      const rows = ["A", "B", "C", "D", "E"];
+
+      rows.forEach(function(row) {
+        for (let number = 1; number <= 8; number++) {
+          const seatName = row + number;
+          const seatButton = document.createElement("button");
+
+          seatButton.textContent = seatName;
+          seatButton.className = "seat";
+
+          if (
+            seatName === "A3" ||
+            seatName === "B5" ||
+            seatName === "C6" ||
+            seatName === "D7"
+          ) {
+            seatButton.classList.add("occupied");
+          } else {
+            seatButton.addEventListener("click", function() {
+              toggleSeat(seatButton, seatName);
+            });
+          }
+
+          seatGrid.appendChild(seatButton);
+        }
+      });
+    }
+
+    function toggleSeat(button, seatName) {
+      const seatIndex = selectedSeats.indexOf(seatName);
+
+      if (seatIndex === -1) {
+        selectedSeats.push(seatName);
+        button.classList.add("selected");
+      } else {
+        selectedSeats.splice(seatIndex, 1);
+        button.classList.remove("selected");
+      }
+
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const adultQty = Number(document.getElementById("adultQty").value);
+      const childQty = Number(document.getElementById("childQty").value);
+      const seniorQty = Number(document.getElementById("seniorQty").value);
+
+      const totalTickets = adultQty + childQty + seniorQty;
+      const totalPrice =
+        adultQty * adultPrice +
+        childQty * childPrice +
+        seniorQty * seniorPrice;
+
+      document.getElementById("selectedSeats").textContent =
+        selectedSeats.length > 0 ? selectedSeats.join(", ") : "None";
+
+      document.getElementById("totalTickets").textContent = totalTickets;
+      document.getElementById("totalPrice").textContent = totalPrice.toFixed(2);
+    }
+
+    function continueBooking() {
+      alert("Booking page prototype complete. Checkout logic will be added in a later sprint.");
+    }
+
+    document.getElementById("adultQty").addEventListener("input", updateSummary);
+    document.getElementById("childQty").addEventListener("input", updateSummary);
+    document.getElementById("seniorQty").addEventListener("input", updateSummary);
+
+    createSeats();
+    updateSummary();
+  </script>
+</body>
+</html>
